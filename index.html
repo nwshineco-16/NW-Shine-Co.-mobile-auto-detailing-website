@@ -444,10 +444,8 @@
         <p>Build your service below and submit your booking request. We'll reach out to confirm.</p>
       </div>
 
-      <form class="booking-form" name="booking" method="POST" netlify netlify-honeypot="bot-field" id="bookingForm">
+      <form class="booking-form" action="https://formspree.io/f/xyezjgnn" method="POST" id="bookingForm">
         
-        <!-- Honeypot spam prevention -->
-        <input type="hidden" name="bot-field" />
 
         <div class="form-row">
           <div>
@@ -616,21 +614,20 @@
     document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
   }
 
-  // NETLIFY FORMS
+  // FORMSPREE FORMS
   const form = document.getElementById('bookingForm');
   const formMsg = document.getElementById('formMsg');
   const formLoading = document.getElementById('formLoading');
   const submitBtn = document.getElementById('submitBtn');
 
   form.addEventListener('submit', function(e){
-    e.preventDefault();
-
     const name = document.getElementById('name').value.trim();
     const contact = document.getElementById('contact').value.trim();
     const address = document.getElementById('address').value.trim();
     const vehicle = document.getElementById('vehicle').value.trim();
 
     if(!name || !contact || !address || !vehicle){
+      e.preventDefault();
       formMsg.textContent = 'Please fill in all required fields.';
       formMsg.classList.remove('success');
       formMsg.classList.add('error');
@@ -641,31 +638,20 @@
     formLoading.classList.add('show');
     submitBtn.disabled = true;
     formMsg.classList.remove('success', 'error');
+  });
 
-    // Let Netlify handle the form submission
-    const formData = new FormData(form);
-    
-    fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(formData)
-    })
-    .then(() => {
-      formLoading.classList.remove('show');
-      submitBtn.disabled = false;
+  // Formspree handles submission automatically
+  // Show success message after submission
+  if(window.location.hash === '#success'){
+    setTimeout(function(){
       formMsg.textContent = '✓ Booking request received! We\'ll contact you within 24 hours to confirm.';
       formMsg.classList.add('success');
       form.reset();
       calculatePrice();
-    })
-    .catch(error => {
       formLoading.classList.remove('show');
       submitBtn.disabled = false;
-      formMsg.textContent = 'Error submitting form. Please try again or call us.';
-      formMsg.classList.add('error');
-      console.error(error);
-    });
-  });
+    }, 500);
+  }
 
   // FAB
   const fabWrap = document.getElementById('fabWrap');
